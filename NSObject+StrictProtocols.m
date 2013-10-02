@@ -13,16 +13,16 @@ static NSUInteger methodCountForProtocol(Protocol*prtcl, BOOL optional)	{
 
 @implementation NSObject (StrictProtocols)
 + (NSDictionary*) cachedConformance 									{ return conformanceCache[CLASS_STRING]; }
-- 			  (BOOL) isaProtocol 											{
+-			  (BOOL) isaProtocol 											{
 
 	const char * name = protocol_getName((Protocol*)self) ?: NULL;
 	return name == NULL ? NO : objc_getProtocol(name) == ((Protocol*)self);
 }
-- 	  		  (BOOL) implementsProtocol:		(id)nameOrProtocol 	{ return [self.class implementsProtocol:nameOrProtocol optionalToo:NO]; }
-- 	   	  (BOOL) implementsFullProtocol:	(id)nameOrProtocol 	{ return [self.class implementsProtocol:nameOrProtocol optionalToo:YES]; }
-+ 		     (BOOL) implementsProtocol: 		(id)nameOrProtocol 	{ return [self implementsProtocol:nameOrProtocol optionalToo:NO]; }
-+ 	        (BOOL) implementsFullProtocol:	(id)nameOrProtocol 	{ return [self implementsProtocol:nameOrProtocol optionalToo:YES]; }
-+ 	   	  (BOOL) implementsProtocol:		(id)nameOrProtocol
+-			  (BOOL) implementsProtocol:		(id)nameOrProtocol 	{ return [self.class implementsProtocol:nameOrProtocol optionalToo:NO]; }
+-			  (BOOL) implementsFullProtocol:	(id)nameOrProtocol 	{ return [self.class implementsProtocol:nameOrProtocol optionalToo:YES]; }
++			  (BOOL) implementsProtocol:		(id)nameOrProtocol 	{ return [self implementsProtocol:nameOrProtocol optionalToo:NO]; }
++			  (BOOL) implementsFullProtocol:	(id)nameOrProtocol 	{ return [self implementsProtocol:nameOrProtocol optionalToo:YES]; }
++			  (BOOL) implementsProtocol:		(id)nameOrProtocol
 								 optionalToo:		(BOOL)opt				{									// private
 	
 	Protocol *proto	= ((NSObject*)nameOrProtocol).isaProtocol ? nameOrProtocol				// did we pass in a string or a protocol?
@@ -40,7 +40,7 @@ static NSUInteger methodCountForProtocol(Protocol*prtcl, BOOL optional)	{
 		struct objc_method_description * methods
 		=	protocol_copyMethodDescriptionList( proto, !optional, YES, &outCt) ?: NULL;  		// get @required, or @optional, dependent.
 		for (int i = 0; i < outCt; ++i)																		// Iterate protocol methods.
-      	if(!class_getInstanceMethod(self, methods[i].name)) { conforms = @NO; break; }   // Bail on any non-implementation
+		if(!class_getInstanceMethod(self, methods[i].name)) { conforms = @NO; break; }   // Bail on any non-implementation
 	   !methods ?: free(methods);      		 methods = NULL;											// Housekeeping
 	};
 	testConformance( NO); if (opt) testConformance(YES);												// if checking @optional, run block with YES;
@@ -67,37 +67,38 @@ static NSUInteger methodCountForProtocol(Protocol*prtcl, BOOL optional)	{
 #pragma clang diagnostic ignored "-Wprotocol"
 @implementation  NonComformantObject												@end
 @implementation SemiComformantObject - (void)    requiredMethod	{	}
-												 - (void) unspecifiedMethod 	{	}	@end
+												 - (void) unspecifiedMethod	{	}	@end
 #pragma clang diagnostic pop
 @implementation   InheritedConformer												@end
-@implementation     ConformantObject - (void)    requiredMethod 	{	}
-												 - (void)    optionalMethod 	{	}
+@implementation     ConformantObject - (void)    requiredMethod	{	}
+												 - (void)    optionalMethod	{	}
 												 - (void) unspecifiedMethod	{	}	@end
-@interface 		  StrictProtocolTests : XCTestCase 						{	Protocol *proto;
-NonComformantObject * non; SemiComformantObject * semi;
-ConformantObject * strict; InheritedConformer  * child; 	}	@end
-@implementation  StrictProtocolTests - (void) 	 			 setUp	{   [super setUp]; proto = @protocol(StrictProtocol);
+@interface 		  StrictProtocolTests : XCTestCase 						{
+Protocol *proto;
+NonComformantObject * non;	SemiComformantObject * semi;
+ConformantObject * strict;	InheritedConformer  * child;				}	@end
+@implementation  StrictProtocolTests - (void)				 setUp	{	[super setUp]; proto = @protocol(StrictProtocol);
 	non = NonComformantObject.new; semi = SemiComformantObject.new; strict = ConformantObject.new; child = InheritedConformer.new;
 }
 - (void)  testConformanceCaching	{ BOOL itDoes;
 	XCTAssert		([strict.class cachedConformance].allKeys.count == 0);
-			itDoes =	[strict 	implementsProtocol:proto];
+			itDoes =	[strict	implementsProtocol:proto];
 	XCTAssert		([strict.class cachedConformance].allKeys.count == 1);
-			itDoes =	[strict 	implementsFullProtocol:proto];
+			itDoes =	[strict	implementsFullProtocol:proto];
 	XCTAssert		([strict.class cachedConformance].allKeys.count == 2);
 	NSLog(@"%@",[strict.class cachedConformance]);
 }
 - (void) testRequiredConformance	{
-	XCTAssertFalse	([non    implementsProtocol:proto], @"non	 	SHOULD NOT conform to the @required protocol");
-	XCTAssert		([child  implementsProtocol:proto], @"child  SHOULD conform to the @required protocol");
-	XCTAssert		([semi   implementsProtocol:proto], @"semi   SHOULD conform to the @required protocol");
-	XCTAssert		([strict implementsProtocol:proto], @"strict SHOULD conform to the @required protocol");
+	XCTAssertFalse	([non		implementsProtocol:proto], @"non	 	SHOULD NOT conform to the @required protocol");
+	XCTAssert		([child	implementsProtocol:proto], @"child  SHOULD conform to the @required protocol");
+	XCTAssert		([semi	implementsProtocol:proto], @"semi   SHOULD conform to the @required protocol");
+	XCTAssert		([strict	implementsProtocol:proto], @"strict SHOULD conform to the @required protocol");
 }
 - (void) testOptionalConformance	{
-	XCTAssertFalse	([non    implementsFullProtocol:proto], @"non    SHOULD NOT conform to the @optional protocol");
-	XCTAssert		([child  implementsFullProtocol:proto], @"child  SHOULD conform to the @optional  protocol");
-	XCTAssertFalse	([semi 	implementsFullProtocol:proto], @"semi   SHOULD NOT conform to the @optional protocol");
-	XCTAssert		([strict implementsFullProtocol:proto], @"strict SHOULD conform to the @optional protocol");
+	XCTAssertFalse	([non	implementsFullProtocol:proto], @"non    SHOULD NOT conform to the @optional protocol");
+	XCTAssert		([child	implementsFullProtocol:proto], @"child  SHOULD conform to the @optional  protocol");
+	XCTAssertFalse	([semi	implementsFullProtocol:proto], @"semi   SHOULD NOT conform to the @optional protocol");
+	XCTAssert		([strict	implementsFullProtocol:proto], @"strict SHOULD conform to the @optional protocol");
 }												@end
 #endif
 

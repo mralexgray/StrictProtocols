@@ -5,11 +5,11 @@
 
 @interface NSObject (StrictProtocols)
 
-- 			  (BOOL) isaProtocol;
-- 	  		  (BOOL) implementsProtocol:		(id)nameOrProtocol;
-- 	   	  (BOOL) implementsFullProtocol:	(id)nameOrProtocol;
-+ 		     (BOOL) implementsProtocol: 		(id)nameOrProtocol;
-+ 	        (BOOL) implementsFullProtocol:	(id)nameOrProtocol;
+-			  (BOOL) isaProtocol;
+-			  (BOOL) implementsProtocol:		(id)nameOrProtocol;
+-			  (BOOL) implementsFullProtocol:	(id)nameOrProtocol;
++			  (BOOL) implementsProtocol: 		(id)nameOrProtocol;
++			  (BOOL) implementsFullProtocol:	(id)nameOrProtocol;
 + (NSDictionary*) cachedConformance;
 
 @end
