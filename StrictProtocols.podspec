@@ -6,11 +6,11 @@ Pod::Spec.new do |s|
   s.license      = 'zlib'
   s.author       = "Alex Gray"
   s.source       = {
-    :git => "https://github.com/mralexgray/BaseModel.git",
+    :git => "https://github.com/mralexgray/StrictProtocols.git",
     :tag => s.version.to_s
   }
   s.requires_arc = true;
   s.ios.deployment_target = '4.3'
   s.osx.deployment_target = '10.6'
-  s.source_files = 'StrictProtocols'
+  s.source_files = 'NSObject+StrictProtocols'
 end
