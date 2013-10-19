@@ -3,6 +3,7 @@
 
 #import "NSObject+StrictProtocols.h"
 #import <objc/Protocol.h>
+#import <objc/runtime.h>
 
 #define CLASS_STRING  NSStringFromClass([self class])
 
@@ -13,7 +14,10 @@ static NSUInteger methodCountForProtocol(Protocol*prtcl, BOOL optional)	{
 
 @implementation NSObject (StrictProtocols)
 + (NSDictionary*) cachedConformance 									{ return conformanceCache[CLASS_STRING]; }
--			  (BOOL) isaProtocol 											{
+-			  (BOOL) isaProtocol 											{ return [self isKindOfClass:Protocol.class];
+
+	if ([NSStringFromClass([self class]) isEqualToString:@"Class"]) return NO;
+	if (class_isMetaClass((id)self)) return NO;
 	const char * name = protocol_getName((Protocol*)self) ?: NULL;
 	return name == NULL ? NO : objc_getProtocol(name) == ((Protocol*)self);
 }
