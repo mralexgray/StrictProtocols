@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.license               = { :type => "zlib", :file => "LICENSE.StrictProtocols.md" }
   s.author                = { 'Alex Gray' => 'alex@mrgray.com' }
   s.ios.deployment_target = '2.0'
-  s.osx.deployment_target = '10.5'
+  s.osx.deployment_target = '10.6'
   s.source                = { :git => "https://github.com/mralexgray/StrictProtocols.git", :tag => "1.0.0" }
   s.source_files          = 'NSObject+StrictProtocols.*{h,m}'
   s.framework             = 'Foundation'

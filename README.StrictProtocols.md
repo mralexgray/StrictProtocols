@@ -39,7 +39,7 @@ and some objects that claim to conform to it..
     NonComformantObject   * non;
     Protocol              * proto = @protocol(StrictProtocol);
 	 
-you can now safely test, cache the results of, and act knowing if the class, or it's acestors ACTUALLY implement a protocol's methods.
+you can now safely test, cache the results of, and act knowing if the class, or it's ancestors ACTUALLY implement a protocol's methods.
 
 ###Panacea
 
